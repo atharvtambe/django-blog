@@ -27,8 +27,12 @@
             </form>
           </div>
           <div class="col-le-6 d-flex justify-content-end align-items-center">
-            <a class="btn btn-sm btn-warning" href="#">Login</a> &nbsp;
-            <a class="btn btn-sm btn-outline-secondary" href="#">register</a>
+            {% if not user.is_authenticated %}
+            <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">register</a>
+            {% else %}
+            <span><a href="{% url 'logout' %}">Logout</a></span>
+            {% endif %}
           </div>
         </div>
       </header>
@@ -49,7 +53,7 @@
 <!-- footer -->
 
  <footer class="blog-footer">
-  <p>Django blog built with � by <a href="https://www.instagram.com/atharv_tambe_15/">Atharv tambe</a></p>
+  <p>Django blog built with � by <a href="">Atharv tambe</a></p>
 </footer>
 </body>
 </html>
