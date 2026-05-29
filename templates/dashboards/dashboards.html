@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
-{% load crispy_forms_tags %}
 
 <div class="row">
     <!-- Left sidebar -->
@@ -11,18 +9,26 @@
 
     <!-- Right side content -->
     <div class="col-md-9">
-        {% if perms.auth.add_user %}
-        <h2>Edit User</h2>
-        
-        <form action="#" method="POST" >
-            {% csrf_token %}
-            {{ form | crispy }}
-            <button type="submit" class="btn btn-warning">Submit</button>
-        </form>
-        <br>
-        {% else %}
-        <h5>You do not have permission to view this page</h5>
-        {% endif %}
+        <span>Logged in as <b>{{ user }}</b></span>
+        <div class="row">
+            <div class="col">
+                <div class="card border-default mb-3">
+                    <div class="card-header text-center text-uppercase font-weight-bold">All Categories</div>
+                    <div class="card-body text-dark">
+                        <h5 class="card-title text-center">{{ category_count }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card border-default mb-3">
+                    <div class="card-header text-center text-uppercase font-weight-bold">All posts</div>
+                    <div class="card-body text-dark">
+                        <h5 class="card-title text-center">{{ blogs_count }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
