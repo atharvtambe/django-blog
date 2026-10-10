@@ -26,9 +26,13 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-62a8=n0u+1e)qz@annn(f%g3p05mehj#&y0s4(g=gyor3$afo&')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'django-blog-bcd8.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -132,6 +136,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+<<<<<<< HEAD
 
 # Google Gemini AI Configuration
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
@@ -144,3 +149,5 @@ CACHES = {
         'LOCATION': 'unique-blog-cache',
     }
 }
+=======
+>>>>>>> 3e4e8a68959b276012ff1acffc108a9bfe6bd76a
