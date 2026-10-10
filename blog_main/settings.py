@@ -136,7 +136,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-<<<<<<< HEAD
+
 
 # Google Gemini AI Configuration
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
