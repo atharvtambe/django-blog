@@ -1,0 +1,366 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header Banner -->
+            <div class="jumbotron p-4 p-md-4 text-white rounded bg-dark mb-4 shadow-sm" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
+                <div class="row align-items-center">
+                    <div class="col-md-9">
+                        <h2 class="font-weight-bold mb-2">
+                            <i class="fa fa-robot text-warning"></i> AI Blog Assistant
+                        </h2>
+                        <p class="lead mb-0 text-light" style="font-size: 1.05rem;">
+                            Ask questions about any topic covered on our blog. Answers are grounded directly in our published articles with source citations.
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-md-right mt-3 mt-md-0">
+                        <span class="badge badge-warning p-2 text-dark font-weight-bold">
+                            <i class="fa fa-shield"></i> Grounded Retrieval
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggested Topics / Questions -->
+            <div class="mb-3">
+                <small class="text-muted font-weight-bold d-block mb-2">
+                    <i class="fa fa-lightbulb-o text-warning"></i> TRY ASKING:
+                </small>
+                <div class="d-flex flex-wrap" id="prompt-pills" style="gap: 8px;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What archaeological gold coins were found in Luxembourg?">
+                        🪙 Luxembourg gold coins
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What happened with CSK in the IPL 2026 season?">
+                        🏏 CSK IPL 2026 autopsy
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What do our articles say about Virat Kohli?">
+                        👑 Virat Kohli
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="Summarize the coverage on MS Dhoni.">
+                        🧤 MS Dhoni
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Container Card -->
+            <div class="card shadow-sm border-secondary mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <span class="font-weight-bold text-dark">
+                        <i class="fa fa-comments text-info"></i> Conversation
+                    </span>
+                    <button type="button" id="clear-chat-btn" class="btn btn-sm btn-link text-muted p-0 text-decoration-none">
+                        <i class="fa fa-trash"></i> Clear chat
+                    </button>
+                </div>
+
+                <!-- Chat Messages Scroll Box -->
+                <div class="card-body p-4" id="chat-messages" style="min-height: 380px; max-height: 580px; overflow-y: auto; background-color: #fbfbfb;">
+                    
+                    <!-- Welcome Message -->
+                    <div class="media mb-4 chat-bubble-ai">
+                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div class="media-body bg-white p-3 rounded shadow-sm border">
+                            <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>
+                            <p class="mb-0 text-secondary" style="line-height: 1.6;">
+                                Hello! Ask me any question about the articles published on this blog. I'll search our database and summarize the answers for you with direct links to the source posts.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Server-rendered response if requested via standard POST -->
+                    {% if question %}
+                    <div class="media mb-4 chat-bubble-user justify-content-end">
+                        <div class="media-body bg-warning text-dark p-3 rounded shadow-sm mr-3 text-right" style="max-width: 80%;">
+                            <h6 class="mt-0 font-weight-bold mb-1">You</h6>
+                            <p class="mb-0">{{ question }}</p>
+                        </div>
+                        <div class="rounded-circle bg-dark text-white font-weight-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            <i class="fa fa-user"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if error %}
+                    <div class="alert alert-danger shadow-sm">
+                        <i class="fa fa-exclamation-triangle"></i> {{ error }}
+                    </div>
+                    {% endif %}
+
+                    {% if answer %}
+                    <div class="media mb-4 chat-bubble-ai">
+                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div class="media-body bg-white p-3 rounded shadow-sm border">
+                            <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>
+                            <div class="chat-answer-text mb-3" style="line-height: 1.7; white-space: pre-line;">
+                                {{ answer }}
+                            </div>
+
+                            {% if sources %}
+                            <div class="border-top pt-2 mt-2">
+                                <small class="text-muted font-weight-bold d-block mb-1">
+                                    <i class="fa fa-book text-info"></i> REFERENCED ARTICLES:
+                                </small>
+                                <ul class="list-unstyled mb-0">
+                                    {% for post in sources %}
+                                    <li class="mb-1">
+                                        <a href="{% url 'blog' post.slug %}" class="badge badge-light border text-info p-2 font-weight-normal text-left d-inline-block text-truncate" style="max-width: 100%;">
+                                            <i class="fa fa-external-link"></i> {{ post.title }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Live Typing Indicator Placeholder -->
+                    <div id="typing-indicator" class="media mb-4" style="display: none;">
+                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div class="media-body bg-white p-3 rounded shadow-sm border" style="max-width: 250px;">
+                            <span class="text-muted"><i class="fa fa-spinner fa-spin text-warning"></i> Searching articles & reasoning...</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Chat Input Footer -->
+                <div class="card-footer bg-white border-top p-3">
+                    <form id="chat-form" method="POST" action="{% url 'ai_chat' %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="chat-input" 
+                                name="question" 
+                                class="form-control form-control-lg border-secondary" 
+                                placeholder="Ask a question about the published articles..." 
+                                maxlength="500" 
+                                autocomplete="off" 
+                                required
+                            />
+                            <div class="input-group-append">
+                                <button type="submit" id="chat-submit-btn" class="btn btn-warning btn-lg font-weight-bold px-4">
+                                    <span>Send</span> <i class="fa fa-paper-plane ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 px-1">
+                            <small class="text-muted">Max 500 characters &bull; Rate-limited per minute</small>
+                            <small class="text-muted"><span id="char-counter">0</span>/500</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notice card -->
+            <div class="card bg-light border-0">
+                <div class="card-body py-2 text-center text-muted small">
+                    <i class="fa fa-lock"></i> All queries are grounded only in published articles. Private drafts and user accounts are never exposed.
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatSubmitBtn = document.getElementById('chat-submit-btn');
+    const chatMessages = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const charCounter = document.getElementById('char-counter');
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    const promptButtons = document.querySelectorAll('.prompt-suggestion');
+
+    // Auto-scroll chat to bottom
+    function scrollToBottom() {
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+    scrollToBottom();
+
+    // Character counter
+    if (chatInput && charCounter) {
+        chatInput.addEventListener('input', function() {
+            charCounter.textContent = this.value.length;
+        });
+    }
+
+    // Prompt pills click handlers
+    promptButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const promptText = this.getAttribute('data-prompt');
+            if (chatInput) {
+                chatInput.value = promptText;
+                if (charCounter) charCounter.textContent = promptText.length;
+                chatInput.focus();
+            }
+        });
+    });
+
+    // Clear chat
+    if (clearChatBtn) {
+        clearChatBtn.addEventListener('click', function() {
+            const bubbles = chatMessages.querySelectorAll('.chat-bubble-user, .chat-bubble-ai:not(:first-child), .alert');
+            bubbles.forEach(b => b.remove());
+        });
+    }
+
+    // Escape HTML helper
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
+    // Append user message to DOM
+    function appendUserMessage(text) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'media mb-4 chat-bubble-user justify-content-end';
+        wrapper.innerHTML = `
+            <div class="media-body bg-warning text-dark p-3 rounded shadow-sm mr-3 text-right" style="max-width: 80%;">
+                <h6 class="mt-0 font-weight-bold mb-1">You</h6>
+                <p class="mb-0">${escapeHtml(text)}</p>
+            </div>
+            <div class="rounded-circle bg-dark text-white font-weight-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                <i class="fa fa-user"></i>
+            </div>
+        `;
+        chatMessages.insertBefore(wrapper, typingIndicator);
+        scrollToBottom();
+    }
+
+    // Append AI response to DOM
+    function appendAiResponse(answerText, sources) {
+        const formattedAnswer = escapeHtml(answerText).replace(/\n/g, '<br>');
+        
+        let sourcesHtml = '';
+        if (sources && sources.length > 0) {
+            let listItems = '';
+            sources.forEach(source => {
+                const url = `/blog/${source.slug}`;
+                listItems += `
+                    <li class="mb-1">
+                        <a href="${url}" class="badge badge-light border text-info p-2 font-weight-normal text-left d-inline-block text-truncate" style="max-width: 100%;">
+                            <i class="fa fa-external-link"></i> ${escapeHtml(source.title)}
+                        </a>
+                    </li>
+                `;
+            });
+
+            sourcesHtml = `
+                <div class="border-top pt-2 mt-2">
+                    <small class="text-muted font-weight-bold d-block mb-1">
+                        <i class="fa fa-book text-info"></i> REFERENCED ARTICLES:
+                    </small>
+                    <ul class="list-unstyled mb-0">
+                        ${listItems}
+                    </ul>
+                </div>
+            `;
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'media mb-4 chat-bubble-ai';
+        wrapper.innerHTML = `
+            <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                <i class="fa fa-robot"></i>
+            </div>
+            <div class="media-body bg-white p-3 rounded shadow-sm border">
+                <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>
+                <div class="chat-answer-text mb-2" style="line-height: 1.7;">
+                    ${formattedAnswer}
+                </div>
+                ${sourcesHtml}
+            </div>
+        `;
+        chatMessages.insertBefore(wrapper, typingIndicator);
+        scrollToBottom();
+    }
+
+    // Append error alert
+    function appendErrorAlert(msg) {
+        const alertEl = document.createElement('div');
+        alertEl.className = 'alert alert-danger shadow-sm mb-4';
+        alertEl.innerHTML = `<i class="fa fa-exclamation-triangle"></i> ${escapeHtml(msg)}`;
+        chatMessages.insertBefore(alertEl, typingIndicator);
+        scrollToBottom();
+    }
+
+    // Submit handler via fetch/AJAX
+    if (chatForm) {
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const question = chatInput.value.trim();
+            if (!question) return;
+
+            if (question.length > 500) {
+                appendErrorAlert('Enter a question under 500 characters.');
+                return;
+            }
+
+            appendUserMessage(question);
+            chatInput.value = '';
+            if (charCounter) charCounter.textContent = '0';
+            chatInput.disabled = true;
+            chatSubmitBtn.disabled = true;
+
+            if (typingIndicator) {
+                typingIndicator.style.display = 'flex';
+                scrollToBottom();
+            }
+
+            const formData = new FormData(chatForm);
+            formData.set('question', question);
+            formData.append('ajax', '1');
+
+            fetch(chatForm.getAttribute('action'), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, body: data })))
+            .then(result => {
+                if (typingIndicator) typingIndicator.style.display = 'none';
+                chatInput.disabled = false;
+                chatSubmitBtn.disabled = false;
+                chatInput.focus();
+
+                if (result.ok && result.body.answer) {
+                    appendAiResponse(result.body.answer, result.body.sources);
+                } else if (result.body && result.body.error) {
+                    appendErrorAlert(result.body.error);
+                } else {
+                    appendErrorAlert('An unexpected error occurred while communicating with the server.');
+                }
+            })
+            .catch(err => {
+                if (typingIndicator) typingIndicator.style.display = 'none';
+                chatInput.disabled = false;
+                chatSubmitBtn.disabled = false;
+                chatInput.focus();
+                appendErrorAlert('Network connection error. Please try again.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

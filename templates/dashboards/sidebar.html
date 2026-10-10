@@ -1,11 +1,24 @@
-<div class="col-md-3">
-    <div class="nav flex-column nav-pills bg-light" aria-orientation="vertical">
-        <a href="{% url 'dashboard' %}" class="nav-link text-dark {% if '/dashboards/' == request.path %}bg-warning{% endif %}">Dashboard</a>
+<div class="col-md-3 mb-4 mb-md-0">
+    <div class="nav flex-row flex-md-column nav-pills bg-light p-2 rounded shadow-sm" aria-orientation="vertical" style="gap: 4px;">
+        <a href="{% url 'dashboard' %}" class="nav-link text-dark flex-fill {% if '/dashboards/' == request.path %}bg-warning font-weight-bold{% endif %}">
+            <i class="fa fa-tachometer mr-1"></i> Dashboard
+        </a>
         {% if perms.auth.view_user %}
-        <a href="{% url 'users' %}" class="nav-link text-dark {% if '/users/' in request.path %}bg-warning{% endif %}">Users</a>
+        <a href="{% url 'users' %}" class="nav-link text-dark flex-fill {% if '/users/' in request.path %}bg-warning font-weight-bold{% endif %}">
+            <i class="fa fa-users mr-1"></i> Users
+        </a>
         {% endif %}
-        <a href="{% url 'categories' %}" class="nav-link text-dark {% if '/categories/' in request.path %}bg-warning{% endif %}">Categories</a>
-        <a href="{% url 'posts' %}" class="nav-link text-dark {% if '/posts/' in request.path %}bg-warning{% endif %}">Posts</a>
-        <a href="{% url 'logout' %}" class="nav-link text-dark">Logout</a>
+        <a href="{% url 'categories' %}" class="nav-link text-dark flex-fill {% if '/categories/' in request.path %}bg-warning font-weight-bold{% endif %}">
+            <i class="fa fa-folder mr-1"></i> Categories
+        </a>
+        <a href="{% url 'posts' %}" class="nav-link text-dark flex-fill {% if '/posts/' in request.path %}bg-warning font-weight-bold{% endif %}">
+            <i class="fa fa-file-text mr-1"></i> Posts
+        </a>
+        <a href="{% url 'ai_chat' %}" class="nav-link text-dark flex-fill">
+            <i class="fa fa-robot text-warning mr-1"></i> AI Assistant
+        </a>
+        <a href="{% url 'logout' %}" class="nav-link text-danger flex-fill">
+            <i class="fa fa-sign-out mr-1"></i> Logout
+        </a>
     </div>
 </div>

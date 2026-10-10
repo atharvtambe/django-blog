@@ -11,7 +11,10 @@ class CategoryForm(forms.ModelForm):
 class BlogPostForm(forms.ModelForm):
     class Meta:
         model = Blog
-        fields = ('title', 'category', 'featured_image', 'short_description', 'blog_body', 'status', 'is_featured')
+        fields = ('title', 'category', 'featured_image', 'short_description', 'blog_body', 'status', 'is_featured', 'source_urls')
+        widgets = {
+            'source_urls': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Source reference URLs for fact-checking'}),
+        }
 
 class AddUserForm(UserCreationForm):
     class Meta:

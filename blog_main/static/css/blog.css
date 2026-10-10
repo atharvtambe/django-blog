@@ -1,22 +1,25 @@
+/* Base Blog Header & Logo */
 .blog-header {
   border-bottom: 1px solid #e5e5e5;
 }
 
 .blog-header-logo {
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif/*rtl:Amiri, Georgia, "Times New Roman", serif*/;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-size: 2.25rem;
+  letter-spacing: -0.5px;
 }
 
 .blog-header-logo:hover {
   text-decoration: none;
+  opacity: 0.9;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif/*rtl:Amiri, Georgia, "Times New Roman", serif*/;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 
 .display-4 {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
 }
 @media (min-width: 768px) {
   .display-4 {
@@ -33,34 +36,126 @@ h1, h2, h3, h4, h5, h6 {
   .h-md-250 { height: 250px; }
 }
 
-/* Pagination */
-.blog-pagination {
-  margin-bottom: 4rem;
+/* Category Navigation Scroller - Fully Responsive Horizontal Scroll */
+.nav-scroller {
+  position: relative;
+  z-index: 2;
+  height: 2.75rem;
+  overflow-y: hidden;
 }
 
-/*
- * Blog posts
- */
+.nav-scroller .nav {
+  display: flex;
+  flex-wrap: nowrap;
+  padding-bottom: 1rem;
+  margin-top: -1px;
+  overflow-x: auto;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-scroller .nav::-webkit-scrollbar {
+  height: 4px;
+}
+.nav-scroller .nav::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.nav-scroller .nav-link,
+.nav-scroller a {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  font-size: .875rem;
+}
+
+/* Blog Posts & Details */
 .blog-post {
   margin-bottom: 4rem;
 }
 .blog-post-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
+}
+@media (min-width: 768px) {
+  .blog-post-title {
+    font-size: 2.5rem;
+  }
 }
 .blog-post-meta {
   margin-bottom: 1.25rem;
   color: #727272;
 }
 
-/*
- * Footer
- */
+/* AI Summary Card Responsive Design */
+#ai-summary-card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease-in-out;
+}
+#ai-summary-card .card-header {
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+}
+.ai-summary-text {
+  font-size: 0.975rem;
+  color: #2d3748;
+}
+
+/* AI Chatbot Responsive Layout */
+#chat-messages {
+  scroll-behavior: smooth;
+}
+.chat-bubble-user .media-body {
+  border-radius: 16px 16px 2px 16px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 82%;
+}
+.chat-bubble-ai .media-body {
+  border-radius: 16px 16px 16px 2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.prompt-suggestion {
+  border-radius: 16px;
+  font-size: 0.8rem;
+  transition: all 0.15s ease-in-out;
+}
+.prompt-suggestion:hover {
+  background-color: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
+}
+
+/* Mobile Specific Optimizations */
+@media (max-width: 767.98px) {
+  .blog-header-logo {
+    font-size: 1.75rem;
+  }
+  .blog-header .btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .chat-bubble-user .media-body {
+    max-width: 90%;
+  }
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  .dashboard-sidebar-nav {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Footer */
 .blog-footer {
   padding: 2.5rem 0;
   color: #727272;
   text-align: center;
   background-color: #f9f9f9;
   border-top: .05rem solid #e5e5e5;
+  margin-top: 3rem;
 }
 .blog-footer p:last-child {
   margin-bottom: 0;

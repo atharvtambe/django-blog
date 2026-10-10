@@ -1,22 +1,51 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 {% load crispy_forms_tags %}
 
 <div class="row">
     <!-- Left sidebar -->
-    <!-- load the sidebar here -->
     {% include 'dashboards/sidebar.html' %}
 
     <!-- Right side content -->
     <div class="col-md-9">
-        <h2>Edit Blog Post</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Edit Blog Post</h2>
+            <a href="{% url 'posts' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa fa-arrow-left"></i> Back to Posts
+            </a>
+        </div>
+
+        {% if post.is_ai_generated %}
+        <div class="alert alert-info border shadow-sm mb-4">
+            <h5 class="alert-heading font-weight-bold">
+                <i class="fa fa-robot"></i> AI-Generated Draft
+                {% if post.generation_date %}
+                <span class="badge badge-light text-dark font-weight-normal float-right">Generated: {{ post.generation_date }}</span>
+                {% endif %}
+            </h5>
+            <p class="mb-2">
+                This post was automatically drafted from technology RSS feeds. Please verify dates, names, quotes, and factual claims before changing the status to <strong>Published</strong>.
+            </p>
+            {% if post.source_urls %}
+            <hr class="my-2">
+            <small class="font-weight-bold text-dark d-block mb-1">
+                <i class="fa fa-external-link"></i> Original Source Material for Fact-Checking:
+            </small>
+            <div class="bg-white p-2 rounded border small" style="word-break: break-all;">
+                {{ post.source_urls|urlize|linebreaksbr }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
         
         <form action="{% url 'edit_post' post.id %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form | crispy }}
-            <button type="submit" class="btn btn-warning">Submit</button>
+            <button type="submit" class="btn btn-warning px-4 font-weight-bold">
+                <i class="fa fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'posts' %}" class="btn btn-light border ml-2">Cancel</a>
         </form>
         <br>
     </div>
