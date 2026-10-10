@@ -149,5 +149,4 @@ CACHES = {
         'LOCATION': 'unique-blog-cache',
     }
 }
-=======
->>>>>>> 3e4e8a68959b276012ff1acffc108a9bfe6bd76a
+
