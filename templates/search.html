@@ -1,23 +1,39 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if keyword %}Search: {{ keyword }}{% else %}Search{% endif %} | The Journal{% endblock %}
+
 {% block content %}
-<h3 class="text-warning" style="letter-spacing: 2px;">Search Term - {{ keyword }}</h3>
-<div class="row mb-2">
+<main>
+  <header class="listing-heading">
+    <span class="eyebrow">Search the journal</span>
+    {% if keyword %}
+    <h1>Results for “{{ keyword }}”</h1>
+    <p>Published articles matching your search.</p>
+    {% else %}
+    <h1>Find a story</h1>
+    <p>Enter a keyword in the search field above to explore published articles.</p>
+    {% endif %}
+  </header>
+
   {% if blog %}
-  {% for i in blog %}
-  <div class="col-md-6">
-    <div class="card border-0" >
-      <div class="card-body">
-        <h3><a href="{% url 'blog' i.slug  %}" class="text-dark">{{ i.title }}</a></h3>
-        <small class="mb-1 text-muted">{{ i.created_at | timesince }} ago | {{ i.author }}</small>
-        <p class="card-text">{{ i.short_description | truncatewords:25 }}</p>
+  <div class="listing-grid">
+    {% for post in blog %}
+    <article class="listing-card">
+      <a class="category-label" href="{% url 'post_by_category' post.category.id %}">{{ post.category }}</a>
+      <h2><a href="{% url 'blog' post.slug %}">{{ post.title }}</a></h2>
+      <div class="story-meta">
+        <span>{{ post.author }}</span>
+        <span>{{ post.created_at|date:"M j, Y" }}</span>
       </div>
-    </div>
+      <p>{{ post.short_description|truncatewords:25 }}</p>
+    </article>
+    {% endfor %}
   </div>
-  {% endfor %}
-  {% else %}
-  <p>No posts found</p>
+  {% elif keyword %}
+  <div class="empty-state">
+    <h2>No matching articles</h2>
+    <p>Try a different search term.</p>
+  </div>
   {% endif %}
-  
-</div>
+</main>
 {% endblock %}

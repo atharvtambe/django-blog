@@ -1,51 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
+<main class="chat-page">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <!-- Header Banner -->
-            <div class="jumbotron p-4 p-md-4 text-white rounded bg-dark mb-4 shadow-sm" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
-                <div class="row align-items-center">
-                    <div class="col-md-9">
-                        <h2 class="font-weight-bold mb-2">
-                            <i class="fa fa-robot text-warning"></i> AI Blog Assistant
-                        </h2>
-                        <p class="lead mb-0 text-light" style="font-size: 1.05rem;">
-                            Ask questions about any topic covered on our blog. Answers are grounded directly in our published articles with source citations.
-                        </p>
-                    </div>
-                    <div class="col-md-3 text-md-right mt-3 mt-md-0">
-                        <span class="badge badge-warning p-2 text-dark font-weight-bold">
-                            <i class="fa fa-shield"></i> Grounded Retrieval
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Suggested Topics / Questions -->
-            <div class="mb-3">
-                <small class="text-muted font-weight-bold d-block mb-2">
-                    <i class="fa fa-lightbulb-o text-warning"></i> TRY ASKING:
-                </small>
-                <div class="d-flex flex-wrap" id="prompt-pills" style="gap: 8px;">
-                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What archaeological gold coins were found in Luxembourg?">
-                        🪙 Luxembourg gold coins
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What happened with CSK in the IPL 2026 season?">
-                        🏏 CSK IPL 2026 autopsy
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="What do our articles say about Virat Kohli?">
-                        👑 Virat Kohli
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary prompt-suggestion" data-prompt="Summarize the coverage on MS Dhoni.">
-                        🧤 MS Dhoni
-                    </button>
-                </div>
-            </div>
+            <header class="chat-intro">
+                <span class="eyebrow">Explore the archive</span>
+                <h1>Ask the journal</h1>
+                <p>Get answers grounded in published articles, with links to the stories behind them.</p>
+                <span class="chat-scope"><i class="fa fa-shield" aria-hidden="true"></i> Published articles only</span>
+            </header>
 
             <!-- Chat Container Card -->
-            <div class="card shadow-sm border-secondary mb-4">
+            <div class="card chat-panel mb-4">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <span class="font-weight-bold text-dark">
                         <i class="fa fa-comments text-info"></i> Conversation
@@ -56,12 +23,12 @@
                 </div>
 
                 <!-- Chat Messages Scroll Box -->
-                <div class="card-body p-4" id="chat-messages" style="min-height: 380px; max-height: 580px; overflow-y: auto; background-color: #fbfbfb;">
+                <div class="card-body p-4" id="chat-messages">
                     
                     <!-- Welcome Message -->
                     <div class="media mb-4 chat-bubble-ai">
-                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
-                            <i class="fa fa-robot"></i>
+                        <div class="chat-avatar rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            AI
                         </div>
                         <div class="media-body bg-white p-3 rounded shadow-sm border">
                             <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>
@@ -92,8 +59,8 @@
 
                     {% if answer %}
                     <div class="media mb-4 chat-bubble-ai">
-                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
-                            <i class="fa fa-robot"></i>
+                        <div class="chat-avatar rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            AI
                         </div>
                         <div class="media-body bg-white p-3 rounded shadow-sm border">
                             <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>
@@ -123,8 +90,8 @@
 
                     <!-- Live Typing Indicator Placeholder -->
                     <div id="typing-indicator" class="media mb-4" style="display: none;">
-                        <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
-                            <i class="fa fa-robot"></i>
+                        <div class="chat-avatar rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                            AI
                         </div>
                         <div class="media-body bg-white p-3 rounded shadow-sm border" style="max-width: 250px;">
                             <span class="text-muted"><i class="fa fa-spinner fa-spin text-warning"></i> Searching articles & reasoning...</span>
@@ -163,7 +130,7 @@
             </div>
 
             <!-- Notice card -->
-            <div class="card bg-light border-0">
+            <div class="chat-notice">
                 <div class="card-body py-2 text-center text-muted small">
                     <i class="fa fa-lock"></i> All queries are grounded only in published articles. Private drafts and user accounts are never exposed.
                 </div>
@@ -171,7 +138,7 @@
 
         </div>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -184,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const typingIndicator = document.getElementById('typing-indicator');
     const charCounter = document.getElementById('char-counter');
     const clearChatBtn = document.getElementById('clear-chat-btn');
-    const promptButtons = document.querySelectorAll('.prompt-suggestion');
 
     // Auto-scroll chat to bottom
     function scrollToBottom() {
@@ -200,18 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
             charCounter.textContent = this.value.length;
         });
     }
-
-    // Prompt pills click handlers
-    promptButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const promptText = this.getAttribute('data-prompt');
-            if (chatInput) {
-                chatInput.value = promptText;
-                if (charCounter) charCounter.textContent = promptText.length;
-                chatInput.focus();
-            }
-        });
-    });
 
     // Clear chat
     if (clearChatBtn) {
@@ -278,8 +232,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const wrapper = document.createElement('div');
         wrapper.className = 'media mb-4 chat-bubble-ai';
         wrapper.innerHTML = `
-            <div class="rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
-                <i class="fa fa-robot"></i>
+            <div class="chat-avatar rounded-circle bg-warning text-dark font-weight-bold d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 42px; height: 42px; min-width: 42px;">
+                AI
             </div>
             <div class="media-body bg-white p-3 rounded shadow-sm border">
                 <h6 class="mt-0 font-weight-bold text-dark mb-1">AI Assistant</h6>

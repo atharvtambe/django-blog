@@ -3,61 +3,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Django Blogs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f2eb">
+    <title>{% block title %}The Journal{% endblock %}</title>
     <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <div class="container px-3 px-md-4">
-      <!-- Responsive Header -->
-      <header class="blog-header py-3">
-        <div class="row align-items-center">
-          <div class="col-12 col-md-3 text-center text-md-left mb-2 mb-md-0">
-            <a class="blog-header-logo text-dark font-weight-bold" href="/">Django Blog</a>
-          </div>
-          <div class="col-12 col-md-5 mb-2 mb-md-0">
-            <form action="{% url 'search' %}" method="GET">
-              <div class="input-group">
-                <input class="form-control" type="text" name="keyword" value="{{ keyword|default:'' }}" placeholder="Search articles..." aria-label="Search articles..." />
-                <div class="input-group-append">
-                  <button type="submit" class="btn btn-warning" id="button-search">
-                    <i class="fa fa-search"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end align-items-center flex-wrap" style="gap: 6px;">
-            <a class="btn btn-sm btn-info text-white" href="{% url 'ai_chat' %}">
-              <i class="fa fa-comments"></i> AI Assistant
-            </a>
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="header-main">
+          <a class="blog-header-logo" href="{% url 'home' %}" aria-label="The Journal home">The Journal<span>.</span></a>
+          <form class="site-search" action="{% url 'search' %}" method="GET" role="search">
+            <label class="sr-only" for="site-search-input">Search articles</label>
+            <input id="site-search-input" type="search" name="keyword" value="{{ keyword|default:'' }}" placeholder="Search the journal">
+            <button type="submit" aria-label="Search"><i class="fa fa-search" aria-hidden="true"></i></button>
+          </form>
+          <nav class="header-actions" aria-label="Account and tools">
+            <a class="header-tool" href="{% url 'ai_chat' %}"><i class="fa fa-comments-o" aria-hidden="true"></i> AI assistant</a>
             {% if not user.is_authenticated %}
-            <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a>
-            <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+            <a class="header-account" href="{% url 'login' %}">Log in</a>
+            <a class="button button-small" href="{% url 'register' %}">Create account</a>
             {% else %}
-            <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard' %}">Dashboard</a>
-            <a class="btn btn-sm btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+            <a class="header-account" href="{% url 'dashboard' %}">Dashboard</a>
+            <a class="header-account" href="{% url 'logout' %}">Log out</a>
             {% endif %}
-          </div>
+          </nav>
+        </div>
+        <div class="category-bar">
+          <nav class="category-nav" aria-label="Categories">
+            <a href="{% url 'home' %}">Home</a>
+            {% for i in categories %}
+            <a href="{% url 'post_by_category' i.id %}">{{ i.category_name }}</a>
+            {% endfor %}
+          </nav>
         </div>
       </header>
 
-      <!-- Horizontal Scrolling Category Nav -->
-      <div class="nav-scroller py-1 mb-3">
-        <nav class="nav d-flex justify-content-start justify-content-md-between">
-          {% for i in categories %}
-          <a class="p-2 text-muted" href="{% url 'post_by_category' i.id %}">{{ i }}</a>
-          {% endfor %}
-        </nav>
-      </div>
-
       <!-- Messages container -->
       {% if messages %}
-      <div class="mt-2 mb-3">
+      <div class="site-messages">
         {% for message in messages %}
         <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
           {{ message }}
@@ -69,13 +56,11 @@
       </div>
       {% endif %}
 
-      <!-- Main content -->
-      {% block content %}
-      {% endblock %}
+      {% block content %}{% endblock %}
 
-      <!-- Footer -->
-      <footer class="blog-footer">
-        <p>Django AI Blog &bull; Built with Django & Google Gemini</p>
+      <footer class="site-footer">
+        <a class="footer-brand" href="{% url 'home' %}">The Journal<span>.</span></a>
+        <p>Thoughtful reading, rooted in the stories published here.</p>
       </footer>
     </div>
 
@@ -83,6 +68,21 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener('error', function(event) {
+        const image = event.target;
+        if (!(image instanceof HTMLImageElement)) return;
+
+        const imageContainer = image.closest('.article-card-image, .featured-story-image, .article-cover');
+        if (!imageContainer) return;
+
+        if (imageContainer.classList.contains('article-cover')) {
+          imageContainer.remove();
+        } else {
+          image.remove();
+        }
+      }, true);
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

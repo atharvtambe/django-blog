@@ -2,11 +2,14 @@
 
 {% block content %}
 {% load crispy_forms_tags %}
-
-<h3 class="text-center">Register</h3>
-<form action="{% url 'register' %}" method="POST" style="width:500px; margin:auto;">
-    {% csrf_token %}
-    {{ form | crispy }}
-    <button type="submit" class="btn btn-warning">Submit</button>
-</form>
+<main class="auth-panel">
+    <span class="eyebrow d-block text-center">Join the journal</span>
+    <h1>Create an account</h1>
+    <p>Register to share your thoughts on published stories.</p>
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <button type="submit" class="btn btn-warning">Create account</button>
+    </form>
+</main>
 {% endblock %}

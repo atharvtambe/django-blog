@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import request
+from django.core.paginator import Paginator
 from blog.models import category,Blog
 from .forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm
@@ -7,17 +8,22 @@ from django.contrib import auth
 
 def home(request):
     categories = category.objects.all()
-    featured_posts = Blog.objects.filter(is_featured=True)
-    
-    posts = Blog.objects.filter(is_featured=False,status='Published')
-
+    featured_posts = list(Blog.objects.filter(
+        is_featured=True,
+        status='Published',
+    ).order_by('-created_at')[:4])
+    post_list = Blog.objects.filter(
+        status='Published',
+    ).exclude(pk__in=[post.pk for post in featured_posts]).order_by('-created_at')
+    posts = Paginator(post_list, 6).get_page(request.GET.get('page'))
 
     context = {
-        'categories' : categories,
-        'featured_posts' : featured_posts,
-        'posts' : posts,
+        'categories': categories,
+        'featured_posts': featured_posts,
+        'posts': posts,
+        'posts_page': posts,
     }
-    return  render(request ,'home.html',context)
+    return render(request, 'home.html', context)
 
 def register(request):
     if request.method == 'POST':

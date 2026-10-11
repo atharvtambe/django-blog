@@ -1,243 +1,199 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<!-- Page content-->
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Post content-->
-            <article>
-                <!-- Post header-->
-                <header class="mb-4">
-                    <!-- Post title-->
-                    <h1 class="fw-bolder mb-1">{{ single_blog.title }}</h1>
-                    <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">Posted on {{ single_blog.created_at }} by {{ single_blog.author }}</div>
-                    <!-- Post category-->
-                    <a class="badge badge-warning text-dark" href="{% url 'post_by_category' single_blog.category.id %}">{{ single_blog.category }}</a>
-                </header>
+{% block title %}{{ single_blog.title }} | The Journal{% endblock %}
 
-                <!-- Preview image figure-->
-                {% if single_blog.featured_image %}
-                <figure class="mb-4"><img class="img-fluid rounded" src="{{ single_blog.featured_image.url }}" alt="{{ single_blog.title }}" /></figure>
+{% block content %}
+<main class="article-page">
+    <nav class="article-breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'post_by_category' single_blog.category.id %}">{{ single_blog.category.category_name }}</a>
+    </nav>
+
+    <header class="article-header">
+        <a class="category-label" href="{% url 'post_by_category' single_blog.category.id %}">{{ single_blog.category.category_name }}</a>
+        <h1 class="article-title">{{ single_blog.title }}</h1>
+        <p class="article-deck">{{ single_blog.short_description }}</p>
+        <div class="article-byline">
+            <span>By <strong>{{ single_blog.author }}</strong></span>
+            <time datetime="{{ single_blog.created_at|date:'c' }}">{{ single_blog.created_at|date:"F j, Y" }}</time>
+        </div>
+    </header>
+
+    {% if single_blog.featured_image %}
+    <figure class="article-cover">
+        <img src="{{ single_blog.featured_image.url }}" alt="{{ single_blog.title }}">
+    </figure>
+    {% endif %}
+
+    <div class="article-layout">
+        <article class="article-main">
+            <section class="summary-panel" id="ai-summary-card" aria-labelledby="summary-title">
+                <div class="summary-heading">
+                    <div>
+                        <span class="eyebrow">Reader tool</span>
+                        <h2 id="summary-title">Article summary</h2>
+                    </div>
+                    <span class="summary-status">{% if single_blog.ai_summary %}Available{% else %}On request{% endif %}</span>
+                </div>
+                <div id="ai-summary-content">
+                    {% if single_blog.ai_summary %}
+                    <div class="ai-summary-text">{{ single_blog.ai_summary|linebreaksbr }}</div>
+                    <form method="post" action="{% url 'summarize_blog' single_blog.pk %}" class="ai-summarize-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="refresh" value="true">
+                        <button type="submit" class="button button-outline">Refresh summary</button>
+                    </form>
+                    {% else %}
+                    <p class="summary-description">Get a concise summary of this article.</p>
+                    <form method="post" action="{% url 'summarize_blog' single_blog.pk %}" class="ai-summarize-form">
+                        {% csrf_token %}
+                        <button type="submit" class="button" id="summarize-btn">Generate summary</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <div id="ai-summary-loading" class="summary-loading" style="display: none;" role="status">
+                    <span class="loading-indicator" aria-hidden="true"></span>
+                    <span>Preparing your summary...</span>
+                </div>
+                <div id="ai-summary-error" class="summary-error" style="display: none;" role="alert"></div>
+            </section>
+
+            <div class="article-body">{{ single_blog.blog_body }}</div>
+
+            <section class="comments-section" aria-labelledby="comments-title">
+                <div class="comments-heading">
+                    <div>
+                        <span class="eyebrow">Reader discussion</span>
+                        <h2 id="comments-title">Comments <span>({{ comment_count }})</span></h2>
+                    </div>
+                </div>
+                {% if comments %}
+                <div class="comment-list">
+                    {% for comment in comments %}
+                    <article class="comment-card">
+                        <p>{{ comment.comment }}</p>
+                        <div class="comment-meta">
+                            <strong>{{ comment.user }}</strong>
+                            <time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|timesince }} ago</time>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="comments-empty">There are no comments yet. Start the conversation.</p>
                 {% endif %}
 
-                <!-- AI Summary Feature Box -->
-                <div class="card mb-4 border-info shadow-sm" id="ai-summary-card">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <span class="font-weight-bold text-dark">
-                            <i class="fa fa-magic text-warning"></i> AI Blog Summary
-                        </span>
-                        {% if single_blog.ai_summary %}
-                        <span class="badge badge-success">Cached</span>
-                        {% else %}
-                        <span class="badge badge-secondary">On Demand</span>
-                        {% endif %}
+                {% if user.is_authenticated %}
+                <form class="comment-form" action="" method="POST">
+                    {% csrf_token %}
+                    <label for="comment-text">Add your perspective</label>
+                    <textarea id="comment-text" name="comment" maxlength="250" rows="4" placeholder="Write a thoughtful comment..." required></textarea>
+                    <div class="comment-form-footer">
+                        <span>Up to 250 characters</span>
+                        <button type="submit" class="button">Post comment</button>
                     </div>
-                    <div class="card-body">
-                        <div id="ai-summary-content">
-                            {% if single_blog.ai_summary %}
-                            <section class="ai-summary mb-3">
-                                <h5 class="text-info font-weight-bold">Summary Highlights</h5>
-                                <div class="ai-summary-text pl-2 border-left border-info" style="border-width: 3px !important; line-height: 1.6;">
-                                    {{ single_blog.ai_summary|linebreaksbr }}
-                                </div>
-                            </section>
-                            <form method="post" action="{% url 'summarize_blog' single_blog.pk %}" class="ai-summarize-form d-inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="refresh" value="true">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fa fa-refresh"></i> Refresh Summary
-                                </button>
-                            </form>
-                            {% else %}
-                            <p class="text-muted mb-3">
-                                Get a quick 5-bullet summary of this article generated by Google Gemini.
-                            </p>
-                            <form method="post" action="{% url 'summarize_blog' single_blog.pk %}" class="ai-summarize-form">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-warning" id="summarize-btn">
-                                    <i class="fa fa-magic"></i> Summarize this blog
-                                </button>
-                            </form>
-                            {% endif %}
-                        </div>
-
-                        <!-- Loading indicator for AJAX -->
-                        <div id="ai-summary-loading" style="display: none;" class="text-center py-3">
-                            <div class="spinner-border text-warning" role="status" style="width: 2rem; height: 2rem;">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                            <p class="text-muted mt-2 mb-0">Analyzing article and generating summary with Gemini...</p>
-                        </div>
-
-                        <!-- Error container for AJAX -->
-                        <div id="ai-summary-error" class="alert alert-danger mt-3" style="display: none;"></div>
-                    </div>
+                </form>
+                {% else %}
+                <div class="comment-signin">
+                    <p>Sign in to join the discussion.</p>
+                    <a class="button button-outline" href="{% url 'login' %}">Log in</a>
                 </div>
+                {% endif %}
+            </section>
+        </article>
 
-                <!-- Post content-->
-                <section class="mb-5">
-                    <p class="lead mb-4 font-italic text-secondary">{{ single_blog.short_description }}</p>
-                    <div class="fs-5 mb-4" style="line-height: 1.8; white-space: pre-line;">
-                        {{ single_blog.blog_body }}
-                    </div>
-
-                    <hr class="my-5">
-
-                    <!-- Comments -->
-                    <h4>Comments ({{ comment_count }})</h4>
-                    {% if comments %}
-                        {% for comment in comments %}
-                            <div class="card mt-2 shadow-sm border-light">
-                                <div class="card-body py-2">
-                                    <p class="card-text mb-1">{{ comment }}</p>
-                                    <small class="text-muted">
-                                        <i class="fa fa-user"></i> {{ comment.user }} &bull; {{ comment.created_at|timesince }} ago
-                                    </small>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">No comments yet. Be the first to share your thoughts!</p>
-                    {% endif %} 
-                    <br>
-                    <div class="form-group mt-3">
-                        {% if user.is_authenticated %}
-                        <form action="" method="POST">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="comment-text" class="font-weight-bold">Leave a comment:</label>
-                                <textarea id="comment-text" name="comment" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
-                                <input type="submit" value="Post Comment" class="btn btn-primary mt-2">
-                            </div>
-                        </form>
-                        {% else %}
-                        <p class="alert alert-light border">Please <a href="{% url 'login' %}" class="font-weight-bold">log in</a> to write a comment.</p>
-                        {% endif %}
-                    </div>
-                </section>
-            </article>
-        </div>
-
-        <!-- Side widgets-->
-        <div class="col-lg-4">
-            <!-- Ask AI widget -->
-            <div class="card mb-4 p-3 border-info shadow-sm bg-light">
-                <h4 class="font-italic text-dark"><i class="fa fa-robot text-info"></i> Ask AI Chatbot</h4>
-                <p class="small text-muted mb-2">Have questions about our articles? Ask our Gemini-powered chatbot.</p>
-                <a href="{% url 'ai_chat' %}" class="btn btn-info text-white btn-block">
-                    <i class="fa fa-comments"></i> Open AI Assistant
-                </a>
-            </div>
-
-            <!-- Categories widget-->
-            <div class="card mb-4 p-3 shadow-sm">
-                <h4 class="font-italic">Categories</h4>
-                <div class="card-body p-0 pt-2">
-                    <ul class="list-unstyled mb-0">
-                        {% for cat in categories %}
-                        <li class="py-1"><a href="{% url 'post_by_category' cat.id %}" class="text-dark">&bull; {{ cat.category_name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Side widget-->
-            {% if social_links %}
-            <div class="card mb-4 p-3 shadow-sm">
-                <h4 class="font-italic">Follow Us</h4>
-                <ol class="list-unstyled mb-0">
-                    {% for i in social_links %}
-                    <li><a href="{{ i.link }}" target="_blank">{{ i.platform }}</a></li>
+        <aside class="article-aside">
+            <section class="aside-card assistant-card">
+                <span class="eyebrow">Explore further</span>
+                <h2>Questions about this story?</h2>
+                <p>Ask the assistant about topics covered in published articles.</p>
+                <a class="button" href="{% url 'ai_chat' %}">Open AI assistant <span aria-hidden="true">&rarr;</span></a>
+            </section>
+            {% if categories %}
+            <nav class="aside-card category-card" aria-label="Browse categories">
+                <span class="eyebrow">Explore topics</span>
+                <h2>Categories</h2>
+                <ul>
+                    {% for cat in categories %}
+                    <li><a href="{% url 'post_by_category' cat.id %}">{{ cat.category_name }} <span aria-hidden="true">&rarr;</span></a></li>
                     {% endfor %}
-                </ol>
-            </div>
+                </ul>
+            </nav>
             {% endif %}
-        </div>
+        </aside>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('.ai-summarize-form');
-    const loadingEl = document.getElementById('ai-summary-loading');
-    const contentEl = document.getElementById('ai-summary-content');
-    const errorEl = document.getElementById('ai-summary-error');
+document.addEventListener('submit', async function(event) {
+    const form = event.target.closest('.ai-summarize-form');
+    if (!form) return;
 
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const url = form.getAttribute('action');
-            const formData = new FormData(form);
-            formData.append('ajax', '1');
+    event.preventDefault();
+    if (form.dataset.submitting === 'true') return;
+    form.dataset.submitting = 'true';
 
-            if (loadingEl) loadingEl.style.display = 'block';
-            if (errorEl) errorEl.style.display = 'none';
+    const loading = document.getElementById('ai-summary-loading');
+    const content = document.getElementById('ai-summary-content');
+    const error = document.getElementById('ai-summary-error');
+    const formData = new FormData(form);
+    formData.set('ajax', '1');
+    loading.style.display = 'flex';
+    error.style.display = 'none';
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                body: formData
-            })
-            .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, body: data })))
-            .then(result => {
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (result.ok && result.body.success) {
-                    const formatted = result.body.summary.replace(/\n/g, '<br>');
-                    const badge = result.body.is_cached 
-                        ? '<span class="badge badge-success">Cached</span>' 
-                        : '<span class="badge badge-primary">Newly Generated</span>';
-                    
-                    const cardHeaderBadge = document.querySelector('#ai-summary-card .card-header .badge');
-                    if (cardHeaderBadge) {
-                        cardHeaderBadge.outerHTML = badge;
-                    }
-
-                    contentEl.innerHTML = `
-                        <section class="ai-summary mb-3">
-                            <h5 class="text-info font-weight-bold">Summary Highlights</h5>
-                            <div class="ai-summary-text pl-2 border-left border-info" style="border-width: 3px !important; line-height: 1.6;">
-                                ${formatted}
-                            </div>
-                        </section>
-                        <form method="post" action="${url}" class="ai-summarize-form d-inline">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${formData.get('csrfmiddlewaretoken')}">
-                            <input type="hidden" name="refresh" value="true">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                <i class="fa fa-refresh"></i> Refresh Summary
-                            </button>
-                        </form>
-                    `;
-                    // Re-bind the newly rendered refresh button
-                    document.querySelector('#ai-summary-content form').addEventListener('submit', function(evt) {
-                        evt.preventDefault();
-                        location.reload();
-                    });
-                } else {
-                    const msg = (result.body && result.body.error) ? result.body.error : 'Failed to generate summary.';
-                    if (errorEl) {
-                        errorEl.textContent = msg;
-                        errorEl.style.display = 'block';
-                    } else {
-                        alert(msg);
-                    }
-                }
-            })
-            .catch(err => {
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (errorEl) {
-                    errorEl.textContent = 'Network or server error while contacting AI service.';
-                    errorEl.style.display = 'block';
-                }
-            });
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: formData
         });
-    });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'The summary could not be generated.');
+        }
+
+        const summary = document.createElement('p');
+        summary.className = 'ai-summary-text';
+        summary.textContent = result.summary;
+
+        const refreshForm = document.createElement('form');
+        refreshForm.method = 'post';
+        refreshForm.action = form.action;
+        refreshForm.className = 'ai-summarize-form';
+
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = formData.get('csrfmiddlewaretoken');
+        refreshForm.appendChild(csrf);
+
+        const refresh = document.createElement('input');
+        refresh.type = 'hidden';
+        refresh.name = 'refresh';
+        refresh.value = 'true';
+        refreshForm.appendChild(refresh);
+
+        const button = document.createElement('button');
+        button.type = 'submit';
+        button.className = 'button button-outline';
+        button.textContent = 'Refresh summary';
+        refreshForm.appendChild(button);
+
+        content.replaceChildren(summary, refreshForm);
+        document.querySelector('.summary-status').textContent = 'Available';
+    } catch (requestError) {
+        error.textContent = requestError.message;
+        error.style.display = 'block';
+    } finally {
+        loading.style.display = 'none';
+        form.dataset.submitting = 'false';
+    }
 });
 </script>
 {% endblock %}

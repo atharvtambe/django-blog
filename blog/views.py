@@ -11,11 +11,12 @@ from .ai_service import summarize_blog_post, answer_blog_chat, check_rate_limit
 
 
 def post_by_category(request, category_id):
-    posts = Blog.objects.filter(status='Published', category=category_id)
+    selected_category = get_object_or_404(category, pk=category_id)
+    posts = Blog.objects.filter(status='Published', category=selected_category)
     
     context = {
         'posts': posts,
-        'category': category,
+        'selected_category': selected_category,
     }
     return render(request, 'post_by_category.html', context)
 
