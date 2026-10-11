@@ -13,3 +13,5 @@ whitenoise
 dj-database-url
 psycopg[binary]
 whitenoise
+django-cloudinary-storage
+cloudinary
